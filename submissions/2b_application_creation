@@ -1,0 +1,2 @@
+Imported emotion_detector from emotion_detection
+emotion_detector("I am happy") -> None

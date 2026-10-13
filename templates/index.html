@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Emotion Detection | Watson NLP</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #17243b; background: #f4f7fb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; padding: 48px 20px; background: radial-gradient(circle at 15% 5%, #e6efff 0, transparent 34%), #f4f7fb; }
+    main { width: min(760px, 100%); margin: 0 auto; }
+    .eyebrow { color: #5268d9; font-size: .78rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 10px 0; font-size: clamp(2rem, 7vw, 3.2rem); letter-spacing: -.055em; }
+    .intro { max-width: 590px; margin: 0 0 28px; color: #65718a; font-size: 1.05rem; line-height: 1.65; }
+    .card { padding: clamp(22px, 5vw, 36px); border: 1px solid #e3e9f3; border-radius: 22px; background: rgba(255,255,255,.94); box-shadow: 0 20px 55px #263f6b12; }
+    label { display: block; margin-bottom: 10px; font-size: .93rem; font-weight: 700; }
+    textarea { display: block; width: 100%; min-height: 130px; resize: vertical; padding: 15px 16px; border: 1px solid #d8dfec; border-radius: 12px; outline: none; color: #17243b; font: inherit; line-height: 1.5; }
+    textarea:focus { border-color: #6876e5; box-shadow: 0 0 0 4px #6876e51c; }
+    button { margin-top: 16px; padding: 13px 20px; border: 0; border-radius: 10px; background: #5366d8; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+    button:hover { background: #4053c1; }
+    .error { margin: 20px 0 0; padding: 14px 16px; border: 1px solid #f3c7c5; border-radius: 10px; background: #fff3f2; color: #a63430; }
+    .results { margin-top: 25px; padding-top: 23px; border-top: 1px solid #e8edf4; }
+    .results h2 { margin: 0 0 7px; font-size: 1.25rem; }
+    .analyzed { margin: 0 0 20px; color: #69758b; overflow-wrap: anywhere; }
+    .dominant { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; padding: 9px 13px; border-radius: 999px; background: #edf0ff; color: #394bb7; font-weight: 750; text-transform: capitalize; }
+    .emotion { display: grid; grid-template-columns: 90px 1fr 58px; gap: 12px; align-items: center; margin: 13px 0; font-size: .9rem; text-transform: capitalize; }
+    .track { height: 9px; overflow: hidden; border-radius: 99px; background: #edf0f6; }
+    .fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6978e8, #9c74e8); }
+    .score { color: #66718a; text-align: right; font-variant-numeric: tabular-nums; }
+    footer { margin-top: 18px; color: #8892a5; font-size: .82rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Watson NLP · Emotion analysis</p>
+    <h1>Understand the feeling behind the words.</h1>
+    <p class="intro">Enter a sentence and see how Watson identifies its emotional signals across five dimensions.</p>
+    <section class="card" aria-label="Emotion analysis">
+      <form action="/analyze" method="post">
+        <label for="text">Text to analyze</label>
+        <textarea id="text" name="text" placeholder="For example: I am excited about what comes next." required>{{ submitted_text|default('') }}</textarea>
+        <button type="submit">Analyze emotions <span aria-hidden="true">→</span></button>
+      </form>
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      {% if result %}
+      <div class="results" aria-live="polite">
+        <h2>Analysis results</h2>
+        <p class="analyzed">“{{ submitted_text }}”</p>
+        <p class="dominant">Dominant emotion: {{ result.dominant_emotion }}</p>
+        {% for emotion in ('anger', 'disgust', 'fear', 'joy', 'sadness') %}
+        <div class="emotion">
+          <span>{{ emotion }}</span>
+          <div class="track"><div class="fill" style="width: {{ (result[emotion] * 100)|round(1) }}%"></div></div>
+          <span class="score">{{ '%.4f'|format(result[emotion]) }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+    <footer>Emotion scores are returned by the IBM Watson NLP service.</footer>
+  </main>
+</body>
+</html>

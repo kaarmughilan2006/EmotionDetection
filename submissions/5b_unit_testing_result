@@ -1,0 +1,25 @@
+test_blank_text_does_not_call_service (test_emotion_detection.EmotionDetectorTests.test_blank_text_does_not_call_service)
+Reject empty and whitespace-only input before making a request. ... ok
+test_formatted_results_and_dominant_emotion (test_emotion_detection.EmotionDetectorTests.test_formatted_results_and_dominant_emotion)
+Return exactly the five scores and the expected dominant label. ... ok
+test_http_400_returns_none_without_parsing (test_emotion_detection.EmotionDetectorTests.test_http_400_returns_none_without_parsing)
+Do not parse an unsuccessful 400 response. ... ok
+test_other_http_error_returns_none_without_parsing (test_emotion_detection.EmotionDetectorTests.test_other_http_error_returns_none_without_parsing)
+Treat all non-200 HTTP statuses as unavailable. ... ok
+test_request_failure_returns_none (test_emotion_detection.EmotionDetectorTests.test_request_failure_returns_none)
+Catch request transport errors without propagating them. ... ok
+test_unexpected_success_payload_returns_none (test_emotion_detection.EmotionDetectorTests.test_unexpected_success_payload_returns_none)
+Handle a malformed successful response without raising. ... ok
+test_blank_submission_skips_service (test_emotion_detection.FlaskRouteTests.test_blank_submission_skips_service)
+Show a form error for blank input without calling Watson. ... ok
+test_home_page_loads (test_emotion_detection.FlaskRouteTests.test_home_page_loads)
+Render the application form at the root URL. ... ok
+test_successful_result_is_rendered (test_emotion_detection.FlaskRouteTests.test_successful_result_is_rendered)
+Display all scores and the dominant emotion from the detector. ... ok
+test_unavailable_service_is_rendered_safely (test_emotion_detection.FlaskRouteTests.test_unavailable_service_is_rendered_safely)
+Show a safe error when the detector returns None. ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.013s
+
+OK
