@@ -1,0 +1,6 @@
+LIVE WATSON CHECK — actual local attempts (no fixture scores)
+Project root: /Users/mughilan/Desktop/Emotion detection
+Formatted detector call: .venv/bin/python -c "from emotion_detection import emotion_detector; print(emotion_detector(\"I am happy\"))"
+None
+Package detector call: .venv/bin/python -c "from EmotionDetection.emotion_detection import emotion_detector; print(emotion_detector(\"I am really angry about this\"))"
+None

@@ -57,17 +57,15 @@ class EmotionDetectorTests(unittest.TestCase):
         ):
             result = emotion_detection.emotion_detector("bad input")
 
-        self.assertEqual(
-            result,
-            {
-                "anger": None,
-                "disgust": None,
-                "fear": None,
-                "joy": None,
-                "sadness": None,
-                "dominant_emotion": None,
-            },
+        expected_keys = (
+            "anger",
+            "disgust",
+            "fear",
+            "joy",
+            "sadness",
+            "dominant_emotion",
         )
+        self.assertEqual(result, dict.fromkeys(expected_keys))
         response.json.assert_not_called()
 
     def test_other_http_error_returns_none_without_parsing(self):

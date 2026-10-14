@@ -1,3 +1,0 @@
-Command executed: .venv/bin/python -c "from EmotionDetection.emotion_detection import emotion_detector; print(emotion_detector(\"I am really angry about this\"))"
-Package import succeeded
-None
