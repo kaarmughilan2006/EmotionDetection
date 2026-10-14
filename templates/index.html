@@ -37,28 +37,26 @@
     <h1>Understand the feeling behind the words.</h1>
     <p class="intro">Enter a sentence and see how Watson identifies its emotional signals across five dimensions.</p>
     <section class="card" aria-label="Emotion analysis">
-      <form action="/analyze" method="post">
-        <label for="text">Text to analyze</label>
-        <textarea id="text" name="text" placeholder="For example: I am excited about what comes next." required>{{ submitted_text|default('') }}</textarea>
+      <form action="/emotionDetector" method="get">
+        <label for="textToAnalyze">Text to analyze</label>
+        <textarea id="textToAnalyze" name="textToAnalyze" placeholder="For example: I am excited about what comes next."></textarea>
         <button type="submit">Analyze emotions <span aria-hidden="true">→</span></button>
       </form>
-      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
-      {% if result %}
-      <div class="results" aria-live="polite">
-        <h2>Analysis results</h2>
-        <p class="analyzed">“{{ submitted_text }}”</p>
-        <p class="dominant">Dominant emotion: {{ result.dominant_emotion }}</p>
-        {% for emotion in ('anger', 'disgust', 'fear', 'joy', 'sadness') %}
-        <div class="emotion">
-          <span>{{ emotion }}</span>
-          <div class="track"><div class="fill" style="width: {{ (result[emotion] * 100)|round(1) }}%"></div></div>
-          <span class="score">{{ '%.4f'|format(result[emotion]) }}</span>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
+      <p id="analysis-result" class="error" role="status" aria-live="polite" hidden></p>
+      <p class="intro">The response includes anger, disgust, fear, joy, sadness, and the dominant emotion.</p>
     </section>
     <footer>Emotion scores are returned by the IBM Watson NLP service.</footer>
   </main>
+  <script>
+    const analysisForm = document.querySelector("form");
+    const resultMessage = document.querySelector("#analysis-result");
+    analysisForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const query = new URLSearchParams(new FormData(analysisForm));
+      const response = await fetch(`${analysisForm.action}?${query}`);
+      resultMessage.textContent = await response.text();
+      resultMessage.hidden = false;
+    });
+  </script>
 </body>
 </html>

@@ -1,2 +1,5 @@
-Imported emotion_detector from emotion_detection
-emotion_detector("I am happy") -> None
+Project root: /Users/mughilan/Desktop/Emotion detection
+Python interpreter: Python 3.13.11
+Command executed: .venv/bin/python -c "from emotion_detection import emotion_detector; print(emotion_detector(\"I am happy\"))"
+Imported emotion_detector successfully
+None

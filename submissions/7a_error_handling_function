@@ -1,6 +1,4 @@
-"""Client for IBM Watson NLP emotion detection."""
-
-from typing import Any
+"""Question 12 version with the required HTTP status 400 behavior."""
 
 import requests
 
@@ -12,18 +10,10 @@ MODEL_ID = "emotion_aggregated-workflow_lang_en_stock"
 EMOTION_NAMES = ("anger", "disgust", "fear", "joy", "sadness")
 
 
-def emotion_detector(text_to_analyze: str) -> dict[str, Any] | None:
-    """Return Watson's five emotion scores and their dominant emotion.
-
-    Return ``None`` for unsuccessful HTTP responses, request failures, or an
-    unexpected service payload. The request is sent only for non-empty text.
-    """
-    if not isinstance(text_to_analyze, str) or not text_to_analyze.strip():
-        return None
-
+def emotion_detector(text_to_analyse):
+    """Return Watson emotion scores; return a None dictionary on HTTP 400."""
     headers = {"grpc-metadata-mm-model-id": MODEL_ID}
-    payload = {"raw_document": {"text": text_to_analyze}}
-
+    payload = {"raw_document": {"text": text_to_analyse}}
     try:
         response = requests.post(
             SERVICE_URL,
@@ -34,13 +24,21 @@ def emotion_detector(text_to_analyze: str) -> dict[str, Any] | None:
     except requests.RequestException:
         return None
 
+    if response.status_code == 400:
+        return {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            "dominant_emotion": None,
+        }
     if response.status_code != 200:
         return None
 
     try:
-        body = response.json()
-        emotions = body["emotionPredictions"][0]["emotion"]
-        scores = {name: float(emotions[name]) for name in EMOTION_NAMES}
+        emotions = response.json()["emotionPredictions"][0]["emotion"]
+        scores = {name: emotions[name] for name in EMOTION_NAMES}
     except (KeyError, IndexError, TypeError, ValueError):
         return None
 
