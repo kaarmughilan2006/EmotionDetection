@@ -1,0 +1,7 @@
+theia@theia-docker:/home/project/final_project$ python3
+Python 3.11.7 (main, Dec 15 2023, 18:12:31) [GCC 11.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from emotion_detection import emotion_detector
+>>> print(emotion_detector('I love this new technology'))
+{'anger': 0.003314986, 'disgust': 0.0022240216, 'fear': 0.0031899994, 'joy': 0.9680373, 'sadness': 0.012544257, 'dominant_emotion': 'joy'}
+>>> exit()

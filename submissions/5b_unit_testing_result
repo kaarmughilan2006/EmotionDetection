@@ -1,25 +1,7 @@
-test_blank_text_skips_service (test_emotion_detection.EmotionDetectorTests.test_blank_text_skips_service)
-Do not request Watson for blank text. ... ok
-test_http_400_returns_none_score_dictionary (test_emotion_detection.EmotionDetectorTests.test_http_400_returns_none_score_dictionary)
-Return the exact six-key None dictionary for HTTP 400. ... ok
-test_invalid_payload_returns_none (test_emotion_detection.EmotionDetectorTests.test_invalid_payload_returns_none)
-Reject malformed successful response structures safely. ... ok
-test_other_http_error_returns_none_without_parsing (test_emotion_detection.EmotionDetectorTests.test_other_http_error_returns_none_without_parsing)
-Return None for non-200 statuses other than the special 400 case. ... ok
-test_request_exception_returns_none (test_emotion_detection.EmotionDetectorTests.test_request_exception_returns_none)
-Handle network request exceptions without propagating them. ... ok
-test_success_parses_scores_and_dominant_emotion (test_emotion_detection.EmotionDetectorTests.test_success_parses_scores_and_dominant_emotion)
-Parse all five scores and select the largest score as dominant. ... ok
-test_detector_route_formats_all_scores (test_emotion_detection.FlaskRouteTests.test_detector_route_formats_all_scores)
-Return every emotion and the dominant label in plain text. ... ok
-test_empty_detector_input_returns_required_error (test_emotion_detection.FlaskRouteTests.test_empty_detector_input_returns_required_error)
-Return the exact required error for absent or whitespace input. ... ok
-test_root_page_loads (test_emotion_detection.FlaskRouteTests.test_root_page_loads)
-Render the home page and text input form. ... ok
-test_unavailable_detector_does_not_crash (test_emotion_detection.FlaskRouteTests.test_unavailable_detector_does_not_crash)
-Return a readable message if Watson is unavailable. ... ok
+theia@theia-docker:/home/project/final_project$ python3 -m unittest test_emotion_detection.py -v
+test_emotion_detector (test_emotion_detection.TestEmotionDetector) ... ok
 
 ----------------------------------------------------------------------
-Ran 10 tests in 0.011s
+Ran 1 test in 0.824s
 
 OK

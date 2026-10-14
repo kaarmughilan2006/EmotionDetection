@@ -1,58 +1,64 @@
-"""IBM Watson NLP emotion detection client used by the Coursera project."""
+"""IBM Watson NLP emotion detection client for Coursera project."""
 
+import json
 import requests
 
-SERVICE_URL = (
+URL = (
     "https://sn-watson-emotion.labs.skills.network/"
     "v1/watson.runtime.nlp.v1/NlpService/EmotionPredict"
 )
-MODEL_ID = "emotion_aggregated-workflow_lang_en_stock"
-EMOTION_NAMES = ("anger", "disgust", "fear", "joy", "sadness")
-HTTP_400_RESULT = {
-    "anger": None,
-    "disgust": None,
-    "fear": None,
-    "joy": None,
-    "sadness": None,
-    "dominant_emotion": None,
+HEADERS = {
+    "grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"
 }
 
 
 def emotion_detector(text_to_analyse):
-    """Return Watson's emotion scores for ``text_to_analyse``.
-
-    A 400 response returns the assignment-specified dictionary of ``None``
-    values. Other unsuccessful HTTP responses, network errors, and malformed
-    successful response bodies return ``None``.
-    """
-    if not isinstance(text_to_analyse, str) or not text_to_analyse.strip():
-        return None
-
-    headers = {"grpc-metadata-mm-model-id": MODEL_ID}
+    """Analyze text and return scores for five emotions plus dominant emotion."""
     payload = {"raw_document": {"text": text_to_analyse}}
 
     try:
-        response = requests.post(
-            SERVICE_URL,
-            headers=headers,
-            json=payload,
-            timeout=8,
-        )
+        response = requests.post(URL, json=payload, headers=HEADERS, timeout=10)
     except requests.RequestException:
         return None
 
     if response.status_code == 400:
-        return HTTP_400_RESULT.copy()
-    if response.status_code != 200:
-        return None
+        return {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            "dominant_emotion": None,
+        }
 
-    try:
-        emotions = response.json()["emotionPredictions"][0]["emotion"]
-        scores = {name: emotions[name] for name in EMOTION_NAMES}
-    except (KeyError, IndexError, TypeError, ValueError):
-        return None
+    if response.status_code == 200:
+        try:
+            response_dict = json.loads(response.text)
+            emotions = response_dict["emotionPredictions"][0]["emotion"]
+            anger_score = emotions["anger"]
+            disgust_score = emotions["disgust"]
+            fear_score = emotions["fear"]
+            joy_score = emotions["joy"]
+            sadness_score = emotions["sadness"]
 
-    return {
-        **scores,
-        "dominant_emotion": max(scores, key=scores.__getitem__),
-    }
+            scores = {
+                "anger": anger_score,
+                "disgust": disgust_score,
+                "fear": fear_score,
+                "joy": joy_score,
+                "sadness": sadness_score,
+            }
+            dominant_emotion = max(scores, key=scores.get)
+
+            return {
+                "anger": anger_score,
+                "disgust": disgust_score,
+                "fear": fear_score,
+                "joy": joy_score,
+                "sadness": sadness_score,
+                "dominant_emotion": dominant_emotion,
+            }
+        except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError):
+            return None
+
+    return None

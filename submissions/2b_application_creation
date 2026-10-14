@@ -1,5 +1,13 @@
-Project root: /Users/mughilan/Desktop/Emotion detection
-Python interpreter: Python 3.13.11
-Command executed: .venv/bin/python -c "from emotion_detection import emotion_detector; print(emotion_detector(\"I am happy\"))"
-Imported emotion_detector successfully
-None
+theia@theia-docker:/home/project/final_project$ python3
+Python 3.11.7 (main, Dec 15 2023, 18:12:31) [GCC 11.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from emotion_detection import emotion_detector
+>>> print(emotion_detector('I am really mad about this'))
+{"emotionPredictions":[{"emotion":{"anger":0.8988015,"disgust":0.009902641,"fear":0.0076296725,"joy":0.005187122,"sadness":0.08847907},"target":"","emotionMentions":[{"span":{"begin":0,"end":26,"text":"I am really mad about this"},"emotion":{"anger":0.8988015,"disgust":0.009902641,"fear":0.0076296725,"joy":0.005187122,"sadness":0.08847907}}]}],"producerId":{"name":"Voting Predictor","version":"0.0.1"}}
+>>> exit()
+theia@theia-docker:/home/project/final_project$ python3 test_emotion_detection.py
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+OK

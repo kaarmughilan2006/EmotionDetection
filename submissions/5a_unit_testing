@@ -1,166 +1,27 @@
-"""Unit tests for the Watson emotion detector and Coursera Flask routes."""
-
+from EmotionDetection.emotion_detection import emotion_detector
 import unittest
-from unittest.mock import Mock, patch
 
-import requests
+class TestEmotionDetector(unittest.TestCase):
+    def test_emotion_detector(self):
+        # Test case for joy
+        result_1 = emotion_detector('I am glad this happened')
+        self.assertEqual(result_1['dominant_emotion'], 'joy')
+        
+        # Test case for anger
+        result_2 = emotion_detector('I am really mad about this')
+        self.assertEqual(result_2['dominant_emotion'], 'anger')
+        
+        # Test case for disgust
+        result_3 = emotion_detector('I feel disgusted just hearing about this')
+        self.assertEqual(result_3['dominant_emotion'], 'disgust')
+        
+        # Test case for sadness
+        result_4 = emotion_detector('I am so sad about this')
+        self.assertEqual(result_4['dominant_emotion'], 'sadness')
+        
+        # Test case for fear
+        result_5 = emotion_detector('I am really afraid that this will happen')
+        self.assertEqual(result_5['dominant_emotion'], 'fear')
 
-from EmotionDetection import emotion_detection
-import server
-
-
-class EmotionDetectorTests(unittest.TestCase):
-    """Verify response parsing without depending on the live Watson service."""
-
-    def setUp(self):
-        """Prepare one Watson-shaped response fixture."""
-        self.scores = {
-            "anger": 0.81,
-            "disgust": 0.02,
-            "fear": 0.04,
-            "joy": 0.03,
-            "sadness": 0.10,
-        }
-        self.response = Mock(status_code=200)
-        self.response.json.return_value = {
-            "emotionPredictions": [{"emotion": self.scores}]
-        }
-
-    def test_success_parses_scores_and_dominant_emotion(self):
-        """Parse all five scores and select the largest score as dominant."""
-        with patch.object(
-            emotion_detection.requests, "post", return_value=self.response
-        ) as post:
-            result = emotion_detection.emotion_detector("I am furious")
-
-        self.assertEqual(result["anger"], 0.81)
-        self.assertEqual(result["disgust"], 0.02)
-        self.assertEqual(result["fear"], 0.04)
-        self.assertEqual(result["joy"], 0.03)
-        self.assertEqual(result["sadness"], 0.10)
-        self.assertEqual(result["dominant_emotion"], "anger")
-        self.assertEqual(set(result), set(self.scores) | {"dominant_emotion"})
-        self.assertEqual(
-            post.call_args.kwargs["headers"]["grpc-metadata-mm-model-id"],
-            emotion_detection.MODEL_ID,
-        )
-        self.assertEqual(
-            post.call_args.kwargs["json"],
-            {"raw_document": {"text": "I am furious"}},
-        )
-
-    def test_http_400_returns_none_score_dictionary(self):
-        """Return the exact six-key None dictionary for HTTP 400."""
-        response = Mock(status_code=400)
-        with patch.object(
-            emotion_detection.requests, "post", return_value=response
-        ):
-            result = emotion_detection.emotion_detector("bad input")
-        expected_keys = (
-            "anger",
-            "disgust",
-            "fear",
-            "joy",
-            "sadness",
-            "dominant_emotion",
-        )
-        self.assertEqual(result, dict.fromkeys(expected_keys))
-        response.json.assert_not_called()
-
-    def test_other_http_error_returns_none_without_parsing(self):
-        """Return None for non-200 statuses other than the special 400 case."""
-        response = Mock(status_code=503)
-        with patch.object(
-            emotion_detection.requests, "post", return_value=response
-        ):
-            self.assertIsNone(emotion_detection.emotion_detector("text"))
-        response.json.assert_not_called()
-
-    def test_invalid_payload_returns_none(self):
-        """Reject malformed successful response structures safely."""
-        response = Mock(status_code=200)
-        response.json.return_value = {"unexpected": "payload"}
-        with patch.object(
-            emotion_detection.requests, "post", return_value=response
-        ):
-            self.assertIsNone(emotion_detection.emotion_detector("text"))
-
-    def test_request_exception_returns_none(self):
-        """Handle network request exceptions without propagating them."""
-        with patch.object(
-            emotion_detection.requests,
-            "post",
-            side_effect=requests.RequestException("connection unavailable"),
-        ):
-            self.assertIsNone(emotion_detection.emotion_detector("text"))
-
-    def test_blank_text_skips_service(self):
-        """Do not request Watson for blank text."""
-        with patch.object(emotion_detection.requests, "post") as post:
-            self.assertIsNone(emotion_detection.emotion_detector(" \n "))
-        post.assert_not_called()
-
-
-class FlaskRouteTests(unittest.TestCase):
-    """Test the assignment's root page and emotion detector response route."""
-
-    def setUp(self):
-        """Create a Flask test client."""
-        self.client = server.app.test_client()
-
-    def test_root_page_loads(self):
-        """Render the home page and text input form."""
-        response = self.client.get("/")
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"textToAnalyze", response.data)
-
-    def test_empty_detector_input_returns_required_error(self):
-        """Return the exact required error for absent or whitespace input."""
-        with patch.object(server, "emotion_detector") as detector:
-            response = self.client.get("/emotionDetector")
-            whitespace = self.client.get(
-                "/emotionDetector?textToAnalyze=%20%20"
-            )
-        expected = "Invalid input! Try again."
-        self.assertEqual(response.get_data(as_text=True), expected)
-        self.assertEqual(whitespace.get_data(as_text=True), expected)
-        detector.assert_not_called()
-
-    def test_detector_route_formats_all_scores(self):
-        """Return every emotion and the dominant label in plain text."""
-        result = {
-            "anger": 0.81,
-            "disgust": 0.02,
-            "fear": 0.04,
-            "joy": 0.03,
-            "sadness": 0.10,
-            "dominant_emotion": "anger",
-        }
-        with patch.object(server, "emotion_detector", return_value=result):
-            response = self.client.get(
-                "/emotionDetector?textToAnalyze=I%20am%20furious"
-            )
-        body = response.get_data(as_text=True)
-        self.assertEqual(response.status_code, 200)
-        for emotion in (
-            "anger",
-            "disgust",
-            "fear",
-            "joy",
-            "sadness",
-            "dominant emotion is anger",
-        ):
-            self.assertIn(emotion, body)
-
-    def test_unavailable_detector_does_not_crash(self):
-        """Return a readable message if Watson is unavailable."""
-        with patch.object(server, "emotion_detector", return_value=None):
-            response = self.client.get(
-                "/emotionDetector?textToAnalyze=I%20am%20happy"
-            )
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("unavailable", response.get_data(as_text=True))
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
