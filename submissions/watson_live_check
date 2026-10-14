@@ -1,2 +1,2 @@
-POST https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict
-ConnectTimeout: HTTPSConnectionPool(host='sn-watson-emotion.labs.skills.network', port=443): Max retries exceeded with url: /v1/watson.runtime.nlp.v1/NlpService/EmotionPredict (Caused by ConnectTimeoutError(<HTTPSConnection(host='sn-watson-emotion.labs.skills.network', port=443) at 0x10aa7b230>, 'Connection to sn-watson-emotion.labs.skills.network timed out. (connect timeout=15)'))
+Live Watson endpoint retry — 2026-10-14
+ConnectTimeout: HTTPSConnectionPool(host='sn-watson-emotion.labs.skills.network', port=443): Max retries exceeded with url: /v1/watson.runtime.nlp.v1/NlpService/EmotionPredict (Caused by ConnectTimeoutError(<HTTPSConnection(host='sn-watson-emotion.labs.skills.network', port=443) at 0x10a9ff230>, 'Connection to sn-watson-emotion.labs.skills.network timed out. (connect timeout=12)'))
